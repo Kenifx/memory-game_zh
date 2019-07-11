@@ -82,8 +82,22 @@ function openCard(event){
 }
 
 function validateCards(){
+  const cards = document.querySelectorAll('.open.show');
 //
 if (openCards[0] === openCards[1]){
-  
+  cards.forEach(function(value,index){
+    value.classList.remove('open','show');
+    value.classList.add('match');
+  })
+
+  //check if all matched;
+} else{
+  setTimeout(function(){
+    cards.forEach(function(value,index){
+      value.classList.remove('open','show');
+    })
+  }, 500)
+  }
 }
-}
+
+displayCards();
