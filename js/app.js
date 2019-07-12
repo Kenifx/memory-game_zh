@@ -2,7 +2,7 @@
  * 创建一个包含所有卡片的数组
  */
 
- let cardsArr =  ['fa fa-anchor', 'fa fa-diamond', 'fa fa-bomb', 'fa fa-leaf', 'fa fa-bolt', 'fa fa-bicycle', 'fa fa-paper-plane-o', 'fa fa-cube']
+ let cardsArr =  ['fa fa-anchor', 'fa fa-diamond', 'fa fa-bomb', 'fa fa-leaf', 'fa fa-bolt', 'fa fa-bicycle', 'fa fa-paper-plane-o', 'fa fa-cube','fa fa-anchor', 'fa fa-diamond', 'fa fa-bomb', 'fa fa-leaf', 'fa fa-bolt', 'fa fa-bicycle', 'fa fa-paper-plane-o', 'fa fa-cube']
  
 
 /*
@@ -14,7 +14,7 @@
 function displayCards(){
   //shuffle
   shuffle(cardsArr);
-  //create HTML for each card
+  //create HTML for each card and add 
   const fragment = document.createDocumentFragment();
 
   for (card of cardsArr){
@@ -65,16 +65,19 @@ let openCards = [];
 
 function openCard(event){
   const clickedCard = event.target;
-//if clicked card is not matched, 
+  if (openCards.length != 2){
+//if clicked card is not matched,
   if (clickedCard.matches('.card') && !clickedCard.classList.contains('open') && !clickedCard.classList.contains('match') ){
     clickedCard.classList.toggle('open');
     clickedCard.classList.toggle('show');
-    //每次点击的计数器
+
+    //counting every move
     countMoves();
     //
     openCards.push(clickedCard.dataset.cardName);
-    //当有2张卡片被点开时，验证2张卡片
-    if (openCards.length ==  2){
+  }
+    //when 2 cards are open, check match/unmatch
+    if (openCards.length == 2){
       validateCards();
     }
   }
@@ -82,63 +85,73 @@ function openCard(event){
 
 function validateCards(){
   const cards = document.querySelectorAll('.open.show');
-//
+//2 cards match checking
+//Match scenario
 if (openCards[0] === openCards[1]){
-  cards.forEach(function(value,index){
+  cards.forEach(function(value){
     value.classList.remove('open','show');
     value.classList.add('match');
   })
-
-  //check if all matched;
+  //check if win 
+  winCheck();
+  //No match scenario
 } else{
   //if not matched, remove .open .show to revert it
   setTimeout(function(){
-    cards.forEach(function(value,index){
+    cards.forEach(function(value){
       value.classList.remove('open','show');
+      //console.log('card not match, remove tags');
     })
-  }, 500)
+  }, 600)
   }
+  //clear open cards
+  openCards = [];
 }
 
 /** below are for move counter functions section */
-// + 增加移动计数器并将其显示在页面上（将这个功能放在你从这个函数中调用的另一个函数中）
-let moves= 0;
+let moves = 0;
 
 //count every move
 function countMoves(){
   moves++;
   showMoves();
-
+  //rating logic
+  if (moves >2){
+    rating();
+  }
+  
 }
 
-//reset move
+//display moves count on screen
+function showMoves(){
+  document.querySelector('.moves').textContent = moves;
+}
+
+//reset move at restart
 function resetMoves(){
   moves=0;
   showMoves();
 }
 
-//display moves count
-function showMoves(){
-  document.querySelector('.moves').textContent = moves;
-}
 
 
 /** below are for win check functions section */
 function winCheck(){
   const matched = document.querySelectorAll('.match');
-  //total card number played are twice the number of unique card number
-  if (matched.length === cardsArr.length*2 ){
+  //when all cards are matched
+  if (matched.length === cardsArr.length ){
     //game is won
     winGame();
   }
 }
 
 function winGame(){
-  const timeSpent = getTime;
+  const timeSpent = getTime();
   stopTimer();
 
-  alert(`Congrats! You have won the game with ${moves} and with ${timeSpent} seconds!
-  `);
+  setTimeout(function(){
+    alert(`Congrats! You have won the game with ${moves} moves and  took ${timeSpent}!`);
+  },600)
 
 }
 
@@ -157,10 +170,10 @@ function getTime(){
 
 }
 
+//Below are for Timer functions
 function startTimer(){
   startTime = Date.now();
   interval = window.setInterval(printTime, 20);
-
 }
 
 function printTime(){
@@ -176,28 +189,50 @@ function resetTimer() {
   stopTimer();
   timer.textContent = '00:00:00';
 }
-//Above are for timer functions
 
+
+
+//restart game function
 function restart() {
   openCards.length = 0;
   document.querySelector('.deck').innerHTML = '';
   resetMoves();
   resetTimer();
-  //resetRating();
   displayCards();
+
+  stars.innerHTML = star + star + star;
+  
 
   document.querySelector('.deck').addEventListener('click', startTimer, {
     once: true
   });
 }
 
+//Rating function
+//try not to be too aggressive ;p
+/*logic: if win game with <40 moves, 3 stars; 40<= moves <= 60 moves, 2 stars; >60, 1 star
+*/
+const stars = document.querySelector('.stars')
+const star = `<li><i class="fa fa-star"></i></li>`;
 
+function rating(){
+
+  if (moves < 60){
+    stars.innerHTML = star + star;
+  } else {
+    stars.innerHTML = star;
+  }
+}
+
+
+
+
+//initiate game
 displayCards();
 
 document.querySelector('.deck').addEventListener('click', openCard);
 
-document.querySelector('.deck').addEventListener('click', startTimer, {
-  once: true
-});
+document.querySelector('.deck').addEventListener('click', startTimer, {once: true});
 
+//restart game
 document.querySelector('.restart').addEventListener('click', restart);
