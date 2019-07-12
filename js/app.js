@@ -2,7 +2,7 @@
  * 创建一个包含所有卡片的数组
  */
 
- const cardsArr =  ['fa fa-anchor', 'fa fa-diamond', 'fa fa-bomb', 'fa fa-leaf', 'fa fa-bolt', 'fa fa-bicycle', 'fa fa-paper-plane-o', 'fa fa-cube']
+ let cardsArr =  ['fa fa-anchor', 'fa fa-diamond', 'fa fa-bomb', 'fa fa-leaf', 'fa fa-bolt', 'fa fa-bicycle', 'fa fa-paper-plane-o', 'fa fa-cube']
  
 
 /*
@@ -70,7 +70,7 @@ function openCard(event){
     clickedCard.classList.toggle('open');
     clickedCard.classList.toggle('show');
     //每次点击的计数器
-
+    countMoves();
     //
     openCards.push(clickedCard.dataset.cardName);
     //当有2张卡片被点开时，验证2张卡片
@@ -159,7 +159,7 @@ function getTime(){
 
 function startTimer(){
   startTime = Date.now();
-  interval = window.setInterval(printTime, 10);
+  interval = window.setInterval(printTime, 20);
 
 }
 
@@ -179,12 +179,12 @@ function resetTimer() {
 //Above are for timer functions
 
 function restart() {
-  openedCards.length = 0;
+  openCards.length = 0;
   document.querySelector('.deck').innerHTML = '';
   resetMoves();
   resetTimer();
-  resetRating();
-  dealCards();
+  //resetRating();
+  displayCards();
 
   document.querySelector('.deck').addEventListener('click', startTimer, {
     once: true
