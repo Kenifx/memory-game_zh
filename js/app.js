@@ -58,7 +58,7 @@ function shuffle(array) {
 */
 
 //* 设置一张卡片的事件监听器。 如果该卡片被点击：
-document.querySelector('.deck').addEventListener('click', openCard);
+
 
 
 let openCards = [];
@@ -78,7 +78,6 @@ function openCard(event){
       validateCards();
     }
   }
-  )
 }
 
 function validateCards(){
@@ -92,6 +91,7 @@ if (openCards[0] === openCards[1]){
 
   //check if all matched;
 } else{
+  //if not matched, remove .open .show to revert it
   setTimeout(function(){
     cards.forEach(function(value,index){
       value.classList.remove('open','show');
@@ -100,4 +100,104 @@ if (openCards[0] === openCards[1]){
   }
 }
 
+/** below are for move counter functions section */
+// + 增加移动计数器并将其显示在页面上（将这个功能放在你从这个函数中调用的另一个函数中）
+let moves= 0;
+
+//count every move
+function countMoves(){
+  moves++;
+  showMoves();
+
+}
+
+//reset move
+function resetMoves(){
+  moves=0;
+  showMoves();
+}
+
+//display moves count
+function showMoves(){
+  document.querySelector('.moves').textContent = moves;
+}
+
+
+/** below are for win check functions section */
+function winCheck(){
+  const matched = document.querySelectorAll('.match');
+  //total card number played are twice the number of unique card number
+  if (matched.length === cardsArr.length*2 ){
+    //game is won
+    winGame();
+  }
+}
+
+function winGame(){
+  const timeSpent = getTime;
+  stopTimer();
+
+  alert(`Congrats! You have won the game with ${moves} and with ${timeSpent} seconds!
+  `);
+
+}
+
+
+//Below are for timer functions
+const timer = document.querySelector('.timer');
+
+function getTime(){
+  let timeElapsed = Date.now() - startTime;
+  let min = Math.floor(timeElapsed/(1000*60)) % 60;
+  let sec = Math.floor(timeElapsed/1000) % 60;
+  let mil = (timeElapsed % 100).toFixed(0);
+
+  let time = min + ':' + sec + ':' + mil;
+  return time;
+
+}
+
+function startTimer(){
+  startTime = Date.now();
+  interval = window.setInterval(printTime, 10);
+
+}
+
+function printTime(){
+  time = getTime();
+  timer.textContent = time;
+}
+
+function stopTimer() {
+  window.clearInterval(interval);
+}
+
+function resetTimer() {
+  stopTimer();
+  timer.textContent = '00:00:00';
+}
+//Above are for timer functions
+
+function restart() {
+  openedCards.length = 0;
+  document.querySelector('.deck').innerHTML = '';
+  resetMoves();
+  resetTimer();
+  resetRating();
+  dealCards();
+
+  document.querySelector('.deck').addEventListener('click', startTimer, {
+    once: true
+  });
+}
+
+
 displayCards();
+
+document.querySelector('.deck').addEventListener('click', openCard);
+
+document.querySelector('.deck').addEventListener('click', startTimer, {
+  once: true
+});
+
+document.querySelector('.restart').addEventListener('click', restart);
